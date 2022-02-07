@@ -212,6 +212,8 @@ window.extend = function() {
 		ding.play();
 		document.getElementById("button").disabled = false;
 		document.getElementById("loader-inner").style.animation = "none";
+		console.log( document.getElementById('sound1').duration, document.getElementById('minduration').value );
+		console.log( document.getElementById('sound1').duration < document.getElementById('minduration').value );
 		if ( document.getElementById('sound1').duration < document.getElementById('minduration').value ) {
 			document.getElementById("inbox").value = response.completions[1].encoding;
 			document.getElementById("button").click();
