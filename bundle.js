@@ -212,8 +212,9 @@ window.extend = function() {
 		ding.play();
 		document.getElementById("button").disabled = false;
 		document.getElementById("loader-inner").style.animation = "none";
-		document.getElementById("inbox").value = response.completions[1].encoding;
-		document.getElementById("button").click();
+		alert( oldDuration );
+		//document.getElementById("inbox").value = response.completions[1].encoding;
+		//document.getElementById("button").click();
 	}).catch(error => {
 		ding.play();
 		document.getElementById("button").disabled = false;
