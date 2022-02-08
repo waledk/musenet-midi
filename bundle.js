@@ -217,7 +217,7 @@ window.extend = function() {
 				document.getElementById("inbox").value = response.completions[1].encoding;
 				document.getElementById("button").click();
 			}
-		}, 1000);
+		}, 10000);
 	}).catch(error => {
 		ding.play();
 		document.getElementById("button").disabled = false;
