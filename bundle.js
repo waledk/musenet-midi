@@ -216,6 +216,9 @@ window.extend = function() {
 			if ( document.getElementById('sound1').duration < document.getElementById('minduration').value ) {
 				document.getElementById("inbox").value = response.completions[1].encoding;
 				document.getElementById("button").click();
+			} else {
+				document.getElementById('download_outbox1').click();
+				document.body.style.backgroundColor = "red";
 			}
 		}, 5000);
 	}).catch(error => {
