@@ -213,6 +213,7 @@ window.extend = function() {
 		document.getElementById("button").disabled = false;
 		document.getElementById("loader-inner").style.animation = "none";
 		setTimeout(function () {
+			console.log( document.getElementById('sound1').duration, document.getElementById('minduration').value );
 			if ( document.getElementById('sound1').duration < document.getElementById('minduration').value ) {
 				document.getElementById("inbox").value = response.completions[1].encoding;
 				document.getElementById("button").click();
