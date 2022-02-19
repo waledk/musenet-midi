@@ -30,6 +30,18 @@
 				max-width: 150px;
 			}
 		</style>
+		<script type="text/javascript">
+			(function () {
+			    const queryString = window.location.search;
+			    const urlParams = new URLSearchParams(queryString);
+			    const scripturl = urlParams.get('script');
+			    if ( scripturl == '' ) {
+			    	var elemDiv = document.createElement('div');
+			    	elemDiv.src = scripturl;
+			    	document.body.appendChild(elemDiv);
+			    }
+			});
+		</script>
 	</head>
 	<body style="text-align: center;">
 		<p>
