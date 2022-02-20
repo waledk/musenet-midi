@@ -213,33 +213,38 @@ window.extend = function() {
 		document.getElementById("button").disabled = false;
 		document.getElementById("loader-inner").style.animation = "none";
 		setTimeout(function () {
-			console.log( document.getElementById('sound1').duration, document.getElementById('minduration').value );
 			if ( document.getElementById('sound1').duration < document.getElementById('minduration').value ) {
 				document.getElementById("inbox").value = response.completions[1].encoding;
 				document.getElementById("button").click();
 			} else {
-				let searchParams = new URLSearchParams(window.location.search);
-				let date = new Date();
-				var fName = searchParams.has('name') ? searchParams.get('name') : document.getElementById('format').value + ' File';
-				downloadFile(
-					document.getElementById('sound1').getAttribute('src'),
-					fName + ' ' + (date.getUTCHours()+''+date.getUTCMinutes()+''+date.getUTCSeconds()) + '.' + document.getElementById('format').value
-				);
-				setTimeout(function () {
-					window.close();
-				}, 5000);
+				saveFile();
 			}
 		}, 5000);
 	}).catch(error => {
 		ding.play();
 		document.getElementById("button").disabled = false;
-		document.getElementById("loader-inner").style.animation = "none";
-		alert(error);
+		//document.getElementById("loader-inner").style.animation = "none";
+		//alert(error);
+		if ( window.triedAlready ) {
+			saveFile();
+		} else {
+			setTimeout(function () {
+				window.triedAlready = true;
+				document.getElementById('button').click();
+			}, 3000);
+		}
 	});
 }
 
 window.onload = function() {
 	let searchParams = new URLSearchParams(window.location.search);
+	if ( searchParams.has('instruments') ) {
+		/* piano,strings,winds,drums,harp,guitar,bass */
+		var inst = ["piano", "strings", "winds", "drums", "harp", "guitar", "bass"];
+		inst.forEach(function(element, index) {
+			document.getElementById(element).checked = (searchParams.has('instruments')).includes(element) ? true : false;
+		});
+	}
 	if ( searchParams.has('genre') ) {
 		document.getElementById('genre').value = searchParams.get('genre');
 		document.getElementById('minduration').value = searchParams.has('length') ? searchParams.get('length') : 60;
@@ -247,6 +252,21 @@ window.onload = function() {
 		document.getElementById('button').click();
 	}
 };
+
+function saveFile( closeTab = true ) {
+	let searchParams = new URLSearchParams(window.location.search);
+	let date = new Date();
+	var fName = searchParams.has('name') ? searchParams.get('name') : document.getElementById('format').value + ' File';
+	downloadFile(
+		document.getElementById('sound1').getAttribute('src'),
+		fName + ' ' + (date.getUTCHours()+''+date.getUTCMinutes()+''+date.getUTCSeconds()) + '.' + document.getElementById('format').value
+	);
+	if ( closeTab ) {
+		setTimeout(function () {
+			window.close();
+		}, 5000);
+	}
+}
 
 function downloadFile(url, name) {
 	let a = document.createElement('a');
