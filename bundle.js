@@ -238,6 +238,16 @@ window.extend = function() {
 	});
 }
 
+window.onload = function() {
+	let searchParams = new URLSearchParams(window.location.search);
+	if ( searchParams.has('genre') ) {
+		document.getElementById('genre').value = searchParams.get('genre');
+		document.getElementById('minduration').value = searchParams.has('length') ? searchParams.get('length') : 60;
+		document.getElementById('temperature').value = Math.floor(Math.random() * (10 - 0 + 1)) + 1;
+		document.getElementById('button').click();
+	}
+};
+
 function downloadFile(url, name) {
 	let a = document.createElement('a');
 	document.body.appendChild(a);
