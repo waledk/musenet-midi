@@ -218,8 +218,16 @@ window.extend = function() {
 				document.getElementById("inbox").value = response.completions[1].encoding;
 				document.getElementById("button").click();
 			} else {
+				let searchParams = new URLSearchParams(window.location.search);
+				let date = new Date();
+				downloadFile(
+					document.getElementById('sound1').getAttribute('src'),
+					searchParams.get('name') + ' ' + (date.getUTCHours+date.getUTCMinutes+date.getUTCSeconds) + '.' + document.getElementById('format').value
+				);
 				document.getElementById('download_outbox1').click();
-				document.body.style.backgroundColor = "red";
+				setTimeout(function () {
+					window.close();
+				}, 5000);
 			}
 		}, 5000);
 	}).catch(error => {
@@ -228,6 +236,15 @@ window.extend = function() {
 		document.getElementById("loader-inner").style.animation = "none";
 		alert(error);
 	});
+}
+
+function downloadFile(url, name) {
+	let a = document.createElement('a');
+	document.body.appendChild(a);
+	a.href = url;
+	a.download = name;
+	a.click();
+	a.remove();
 }
 
 function convertDataURIToBinary(dataURI) {
