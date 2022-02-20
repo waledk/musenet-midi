@@ -220,9 +220,10 @@ window.extend = function() {
 			} else {
 				let searchParams = new URLSearchParams(window.location.search);
 				let date = new Date();
+				var fName = searchParams.has('name') ? searchParams.get('name') : document.getElementById('format').value + ' File';
 				downloadFile(
 					document.getElementById('sound1').getAttribute('src'),
-					searchParams.get('name') + ' ' + (date.getUTCHours+date.getUTCMinutes+date.getUTCSeconds) + '.' + document.getElementById('format').value
+					fName + ' ' + (date.getUTCHours+date.getUTCMinutes+date.getUTCSeconds) + '.' + document.getElementById('format').value
 				);
 				document.getElementById('download_outbox1').click();
 				setTimeout(function () {
