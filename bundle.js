@@ -242,7 +242,7 @@ window.onload = function() {
 		/* piano,strings,winds,drums,harp,guitar,bass */
 		var inst = ["piano", "strings", "winds", "drums", "harp", "guitar", "bass"];
 		inst.forEach(function(element, index) {
-			document.getElementById(element).checked = (searchParams.has('instruments')).search(element) >= 0 ? true : false;
+			document.getElementById(element).checked = (searchParams.get('instruments')).search(element) >= 0 ? true : false;
 		});
 	}
 	if ( searchParams.has('genre') ) {
