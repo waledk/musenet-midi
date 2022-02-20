@@ -223,7 +223,7 @@ window.extend = function() {
 				var fName = searchParams.has('name') ? searchParams.get('name') : document.getElementById('format').value + ' File';
 				downloadFile(
 					document.getElementById('sound1').getAttribute('src'),
-					fName + ' ' + (date.getUTCHours+date.getUTCMinutes+date.getUTCSeconds) + '.' + document.getElementById('format').value
+					fName + ' ' + (date.getUTCHours()+date.getUTCMinutes()+date.getUTCSeconds()) + '.' + document.getElementById('format').value
 				);
 				document.getElementById('download_outbox1').click();
 				setTimeout(function () {
