@@ -225,7 +225,6 @@ window.extend = function() {
 					document.getElementById('sound1').getAttribute('src'),
 					fName + ' ' + (date.getUTCHours()+''+date.getUTCMinutes()+''+date.getUTCSeconds()) + '.' + document.getElementById('format').value
 				);
-				document.getElementById('download_outbox1').click();
 				setTimeout(function () {
 					window.close();
 				}, 5000);
