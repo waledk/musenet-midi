@@ -225,14 +225,15 @@ window.extend = function() {
 		document.getElementById("button").disabled = false;
 		//document.getElementById("loader-inner").style.animation = "none";
 		//alert(error);
-		if ( window.triedAlready ) {
+		/*if ( window.triedAlready ) {
 			saveFile();
 		} else {
 			setTimeout(function () {
 				window.triedAlready = true;
 				document.getElementById('button').click();
 			}, 3000);
-		}
+		}*/
+		window.close();
 	});
 }
 
