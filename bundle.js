@@ -155,12 +155,13 @@ window.extend = function() {
 	if (genre == "<random>") {
 		genre = genreList[Math.floor(Math.random()*genreList.length)];
 	}
-	fetch("https://musenet.openai.com/sample", {
-		"method": "POST",
-		"headers": {
+
+	$.ajax('https://musenet.openai.com/sample', {
+		type: 'POST',  // http method
+		headers: {
 			"Content-Type": "application/json"
 		},
-		"body": JSON.stringify({
+		data: {
 			"genre": genre,
 			"instrument":{
 				"piano": document.getElementById("piano").checked,
@@ -176,65 +177,49 @@ window.extend = function() {
 			"truncation":parseFloat(document.getElementById("truncation").value),
 			"generationLength":parseFloat(document.getElementById("generationLength").value),
 			"audioFormat": document.getElementById("format").value
-		})
-	}).then(res => res.json()).then(function (response) {
-		window.oldDuration = Math.min(document.getElementById('sound1').duration,
+		},  // data to submit
+		success: function (response, status, xhr) {
+			console.log( response );
+			window.oldDuration = Math.min(document.getElementById('sound1').duration,
 								   document.getElementById('sound2').duration,
 								   document.getElementById('sound3').duration,
 								   document.getElementById('sound4').duration);
-		window.oldDuration -= 5;
-		if (isNaN(oldDuration) || !isFinite(oldDuration) || oldDuration < 0) {
-			oldDuration = 0;
-		}
-		//need to convert from dataURI to blob to avoid firefox issue
-		var format = "audio/mp3";
-		var audioKey = "audioFile";
-		if (response.completions[0].oggFile) {
-			format = "audio/ogg";
-			audioKey = "oggFile";
-		}
-		document.getElementById('sound1').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[0][audioKey].substring(2,response.completions[0][audioKey].length-1))], {type : format}));
-		document.getElementById('sound2').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[1][audioKey].substring(2,response.completions[1][audioKey].length-1))], {type : format}));
-		document.getElementById('sound3').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[2][audioKey].substring(2,response.completions[2][audioKey].length-1))], {type : format}));
-		document.getElementById('sound4').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[3][audioKey].substring(2,response.completions[3][audioKey].length-1))], {type : format}));
-		document.getElementById("outbox1").value = response.completions[0].encoding;
-		document.getElementById("outbox2").value = response.completions[1].encoding;
-		document.getElementById("outbox3").value = response.completions[2].encoding;
-		document.getElementById("outbox4").value = response.completions[3].encoding;
-		window.encodingToMidiFile(response.completions[0].encoding, "download_outbox1");
-		window.encodingToMidiFile(response.completions[1].encoding, "download_outbox2");
-		window.encodingToMidiFile(response.completions[2].encoding, "download_outbox3");
-		window.encodingToMidiFile(response.completions[3].encoding, "download_outbox4");
-		document.getElementById('sound1').currentTime = oldDuration;
-		document.getElementById('sound2').currentTime = oldDuration;
-		document.getElementById('sound3').currentTime = oldDuration;
-		document.getElementById('sound4').currentTime = oldDuration;
-		ding.play();
-		document.getElementById("button").disabled = false;
-		document.getElementById("loader-inner").style.animation = "none";
-		setTimeout(function () {
-			if ( document.getElementById('sound1').duration < document.getElementById('minduration').value ) {
-				document.getElementById("inbox").value = response.completions[1].encoding;
-				document.getElementById("button").click();
-			} else {
-				saveFile();
+			window.oldDuration -= 5;
+			if (isNaN(oldDuration) || !isFinite(oldDuration) || oldDuration < 0) {
+				oldDuration = 0;
 			}
-		}, 5000);
-	}).catch(error => {
-		ding.play();
-		document.getElementById("button").disabled = false;
-		//document.getElementById("loader-inner").style.animation = "none";
-		//alert(error);
-		/*if ( window.triedAlready ) {
-			saveFile();
-		} else {
-			setTimeout(function () {
-				window.triedAlready = true;
-				document.getElementById('button').click();
-			}, 3000);
-		}*/
-		window.close();
+			//need to convert from dataURI to blob to avoid firefox issue
+			var format = "audio/mp3";
+			var audioKey = "audioFile";
+			if (response.completions[0].oggFile) {
+				format = "audio/ogg";
+				audioKey = "oggFile";
+			}
+			document.getElementById('sound1').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[0][audioKey].substring(2,response.completions[0][audioKey].length-1))], {type : format}));
+			document.getElementById('sound2').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[1][audioKey].substring(2,response.completions[1][audioKey].length-1))], {type : format}));
+			document.getElementById('sound3').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[2][audioKey].substring(2,response.completions[2][audioKey].length-1))], {type : format}));
+			document.getElementById('sound4').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[3][audioKey].substring(2,response.completions[3][audioKey].length-1))], {type : format}));
+			document.getElementById("outbox1").value = response.completions[0].encoding;
+			document.getElementById("outbox2").value = response.completions[1].encoding;
+			document.getElementById("outbox3").value = response.completions[2].encoding;
+			document.getElementById("outbox4").value = response.completions[3].encoding;
+			window.encodingToMidiFile(response.completions[0].encoding, "download_outbox1");
+			window.encodingToMidiFile(response.completions[1].encoding, "download_outbox2");
+			window.encodingToMidiFile(response.completions[2].encoding, "download_outbox3");
+			window.encodingToMidiFile(response.completions[3].encoding, "download_outbox4");
+			document.getElementById('sound1').currentTime = oldDuration;
+			document.getElementById('sound2').currentTime = oldDuration;
+			document.getElementById('sound3').currentTime = oldDuration;
+			document.getElementById('sound4').currentTime = oldDuration;
+			ding.play();
+			document.getElementById("button").disabled = false;
+			document.getElementById("loader-inner").style.animation = "none";
+		},
+		error: function (jqXhr, textStatus, errorMessage) {
+				console.log(errorMessage);
+		}
 	});
+
 }
 
 window.onload = function() {
