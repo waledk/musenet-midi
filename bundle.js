@@ -155,7 +155,7 @@ window.extend = function() {
 	if (genre == "<random>") {
 		genre = genreList[Math.floor(Math.random()*genreList.length)];
 	}
-	fetch("https://musenet.openai.com/sample", {
+	fetch("https://mnp.tcrk.workers.dev/https://musenet.openai.com/sample", {
 		"method": "POST",
 		"headers": {
 			"Content-Type": "application/json"
