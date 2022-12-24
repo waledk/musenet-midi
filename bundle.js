@@ -155,13 +155,12 @@ window.extend = function() {
 	if (genre == "<random>") {
 		genre = genreList[Math.floor(Math.random()*genreList.length)];
 	}
-
-	$.ajax('https://musenet.openai.com/sample', {
-		type: 'POST',  // http method
-		headers: {
+	fetch("https://musenet.openai.com/sample", {
+		"method": "POST",
+		"headers": {
 			"Content-Type": "application/json"
 		},
-		data: {
+		"body": JSON.stringify({
 			"genre": genre,
 			"instrument":{
 				"piano": document.getElementById("piano").checked,
@@ -177,90 +176,48 @@ window.extend = function() {
 			"truncation":parseFloat(document.getElementById("truncation").value),
 			"generationLength":parseFloat(document.getElementById("generationLength").value),
 			"audioFormat": document.getElementById("format").value
-		},  // data to submit
-		success: function (response, status, xhr) {
-			console.log( response );
-			window.oldDuration = Math.min(document.getElementById('sound1').duration,
+		})
+	}).then(res => res.json()).then(function (response) {
+		window.oldDuration = Math.min(document.getElementById('sound1').duration,
 								   document.getElementById('sound2').duration,
 								   document.getElementById('sound3').duration,
 								   document.getElementById('sound4').duration);
-			window.oldDuration -= 5;
-			if (isNaN(oldDuration) || !isFinite(oldDuration) || oldDuration < 0) {
-				oldDuration = 0;
-			}
-			//need to convert from dataURI to blob to avoid firefox issue
-			var format = "audio/mp3";
-			var audioKey = "audioFile";
-			if (response.completions[0].oggFile) {
-				format = "audio/ogg";
-				audioKey = "oggFile";
-			}
-			document.getElementById('sound1').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[0][audioKey].substring(2,response.completions[0][audioKey].length-1))], {type : format}));
-			document.getElementById('sound2').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[1][audioKey].substring(2,response.completions[1][audioKey].length-1))], {type : format}));
-			document.getElementById('sound3').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[2][audioKey].substring(2,response.completions[2][audioKey].length-1))], {type : format}));
-			document.getElementById('sound4').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[3][audioKey].substring(2,response.completions[3][audioKey].length-1))], {type : format}));
-			document.getElementById("outbox1").value = response.completions[0].encoding;
-			document.getElementById("outbox2").value = response.completions[1].encoding;
-			document.getElementById("outbox3").value = response.completions[2].encoding;
-			document.getElementById("outbox4").value = response.completions[3].encoding;
-			window.encodingToMidiFile(response.completions[0].encoding, "download_outbox1");
-			window.encodingToMidiFile(response.completions[1].encoding, "download_outbox2");
-			window.encodingToMidiFile(response.completions[2].encoding, "download_outbox3");
-			window.encodingToMidiFile(response.completions[3].encoding, "download_outbox4");
-			document.getElementById('sound1').currentTime = oldDuration;
-			document.getElementById('sound2').currentTime = oldDuration;
-			document.getElementById('sound3').currentTime = oldDuration;
-			document.getElementById('sound4').currentTime = oldDuration;
-			ding.play();
-			document.getElementById("button").disabled = false;
-			document.getElementById("loader-inner").style.animation = "none";
-		},
-		error: function (jqXhr, textStatus, errorMessage) {
-				console.log(errorMessage);
+		window.oldDuration -= 5;
+		if (isNaN(oldDuration) || !isFinite(oldDuration) || oldDuration < 0) {
+			oldDuration = 0;
 		}
+		//need to convert from dataURI to blob to avoid firefox issue
+		var format = "audio/mp3";
+		var audioKey = "audioFile";
+		if (response.completions[0].oggFile) {
+			format = "audio/ogg";
+			audioKey = "oggFile";
+		}
+		document.getElementById('sound1').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[0][audioKey].substring(2,response.completions[0][audioKey].length-1))], {type : format}));
+		document.getElementById('sound2').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[1][audioKey].substring(2,response.completions[1][audioKey].length-1))], {type : format}));
+		document.getElementById('sound3').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[2][audioKey].substring(2,response.completions[2][audioKey].length-1))], {type : format}));
+		document.getElementById('sound4').src=URL.createObjectURL(new Blob([convertDataURIToBinary("data:"+format+";base64,"+response.completions[3][audioKey].substring(2,response.completions[3][audioKey].length-1))], {type : format}));
+		document.getElementById("outbox1").value = response.completions[0].encoding;
+		document.getElementById("outbox2").value = response.completions[1].encoding;
+		document.getElementById("outbox3").value = response.completions[2].encoding;
+		document.getElementById("outbox4").value = response.completions[3].encoding;
+		window.encodingToMidiFile(response.completions[0].encoding, "download_outbox1");
+		window.encodingToMidiFile(response.completions[1].encoding, "download_outbox2");
+		window.encodingToMidiFile(response.completions[2].encoding, "download_outbox3");
+		window.encodingToMidiFile(response.completions[3].encoding, "download_outbox4");
+		document.getElementById('sound1').currentTime = oldDuration;
+		document.getElementById('sound2').currentTime = oldDuration;
+		document.getElementById('sound3').currentTime = oldDuration;
+		document.getElementById('sound4').currentTime = oldDuration;
+		ding.play();
+		document.getElementById("button").disabled = false;
+		document.getElementById("loader-inner").style.animation = "none";
+	}).catch(error => {
+		ding.play();
+		document.getElementById("button").disabled = false;
+		document.getElementById("loader-inner").style.animation = "none";
+		alert(error);
 	});
-
-}
-
-window.onload = function() {
-	let searchParams = new URLSearchParams(window.location.search);
-	if ( searchParams.has('instruments') ) {
-		/* piano,strings,winds,drums,harp,guitar,bass */
-		var inst = ["piano", "strings", "winds", "drums", "harp", "guitar", "bass"];
-		inst.forEach(function(element, index) {
-			document.getElementById(element).checked = (searchParams.get('instruments')).search(element) >= 0 ? true : false;
-		});
-	}
-	if ( searchParams.has('genre') ) {
-		document.getElementById('genre').value = searchParams.get('genre');
-		document.getElementById('minduration').value = searchParams.has('length') ? searchParams.get('length') : 60;
-		document.getElementById('temperature').value = Math.floor(Math.random() * (10 - 0 + 1)) + 1;
-		document.getElementById('button').click();
-	}
-};
-
-function saveFile( closeTab = true ) {
-	let searchParams = new URLSearchParams(window.location.search);
-	let date = new Date();
-	var fName = searchParams.has('name') ? searchParams.get('name') : document.getElementById('format').value + ' File';
-	downloadFile(
-		document.getElementById('sound1').getAttribute('src'),
-		fName + ' ' + (date.getUTCHours()+''+date.getUTCMinutes()+''+date.getUTCSeconds()) + '.' + document.getElementById('format').value
-	);
-	if ( closeTab ) {
-		setTimeout(function () {
-			window.close();
-		}, 5000);
-	}
-}
-
-function downloadFile(url, name) {
-	let a = document.createElement('a');
-	document.body.appendChild(a);
-	a.href = url;
-	a.download = name;
-	a.click();
-	a.remove();
 }
 
 function convertDataURIToBinary(dataURI) {
